@@ -29,7 +29,6 @@ workflow  {
 
 process getChromsomeInfo {
   container 'community.wave.seqera.io/library/bcftools:1.21--374767bf77752fc2'
-  //container '096672585100.dkr.ecr.us-west-1.amazonaws.com/bcftools:latest'
 
   input: 
   tuple val(id), path(vcf)
@@ -54,7 +53,6 @@ process getChromsomeInfo {
 process glnexus {
   cpus 16
   memory "16G"
-  //container 'ghcr.io/dnanexus-rnd/glnexus:v1.4.1'
   container 'community.wave.seqera.io/library/glnexus_jemalloc:f7d379f09441d9b8'
 
   input:
@@ -66,6 +64,7 @@ process glnexus {
 
   script:
   """
+  LD_PRELOAD=\$MAMBA_ROOT_PREFIX/lib/x86_64-linux-gnu/libjemalloc.so \\
   glnexus_cli -t ${task.cpus} --config DeepVariant \\
   --bed <(echo -e '${chr}\t1\t${size}')  \\
   ${vcfs} > ${params.study_name}-${chr}.bcf
