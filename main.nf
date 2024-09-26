@@ -83,8 +83,8 @@ process  indexVCF {
 }
 
 process splitVCF {
-  cpus 2
-  memory '4 GB'
+  cpus 1
+  memory '3 GB'
   container 'community.wave.seqera.io/library/bcftools:1.21--374767bf77752fc2'
   
   input:
