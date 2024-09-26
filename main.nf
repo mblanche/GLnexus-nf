@@ -1,4 +1,5 @@
 params.input = null
+params.outDir = null
 params.study_name = 'study'
 
 workflow  {
