@@ -1,8 +1,5 @@
 params.input = null
 params.study_name = 'study'
-// params.chrBed
-// params.glnexusConfig
-
 
 workflow  {
   Channel.fromPath(params.input)
@@ -64,6 +61,7 @@ process glnexus {
   path(vcfs)
 
   output:
+  path('*.bcf')
 
   script:
   """
