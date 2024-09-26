@@ -15,11 +15,6 @@ workflow  {
 
   getChromsomeInfo(gVCFs.take(1))
     .splitCsv()
-    .map{ chr, size ->   //TODO remove after testing
-      if (chr == 'chr22') {
-        tuple(chr,size)
-        }
-    }
     .set { chrSize }
     
   glnexus(chrSize, filePaths)
@@ -52,7 +47,7 @@ process getChromsomeInfo {
 
 process glnexus {
   cpus 16
-  memory "252 GB" //fdasfas
+  memory "256 GB" //fdasfas
   container 'community.wave.seqera.io/library/glnexus_jemalloc:f7d379f09441d9b8'
 
   input:
