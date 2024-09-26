@@ -128,7 +128,7 @@ process getChromsomeInfo {
 //TODO Need to code the memory size
 process glnexus {
   cpus 16
-  memory "64 GB"
+  memory "72 GB"
   container 'community.wave.seqera.io/library/glnexus_jemalloc:f7d379f09441d9b8'
 
   input:
