@@ -18,7 +18,6 @@ workflow  {
     .set { chrSize }
     
   glnexus(chrSize, filePaths)
-  
   bcf2vcf(glnexus.out)
   
 }
