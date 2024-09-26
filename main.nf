@@ -15,6 +15,11 @@ workflow  {
 
   getChromsomeInfo(gVCFs.take(1))
     .splitCsv()
+    .map{ chr, size ->   //TODO remove after testing
+      if (chr == 'chr22') {
+        tuple(chr,size)
+        }
+    }
     .set { chrSize }
     
   glnexus(chrSize, filePaths)
@@ -47,7 +52,7 @@ process getChromsomeInfo {
 
 process glnexus {
   cpus 16
-  memory "64GB" //fdasfas
+  memory "64 GB" //fdasfas
   container 'community.wave.seqera.io/library/glnexus_jemalloc:f7d379f09441d9b8'
 
   input:
@@ -73,7 +78,7 @@ process glnexus {
 
 process bcf2vcf {
   cpus 4
-  memory "16GB"
+  memory "16 GB"
   container 'community.wave.seqera.io/library/bcftools:1.21--374767bf77752fc2'
 
   publishDir "${params.outDir}/joint-genotyping"
