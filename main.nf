@@ -23,7 +23,6 @@ workflow  {
   
 }
 
-
 process getChromsomeInfo {
   container 'community.wave.seqera.io/library/bcftools:1.21--374767bf77752fc2'
 
@@ -72,7 +71,6 @@ process glnexus {
   touch ${params.study_name}-${chr}.bcf
   """
 }
-
 
 process bcf2vcf {
   cpus 4
