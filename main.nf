@@ -24,6 +24,8 @@ workflow  {
     .set { chrSize }
     
   glnexus(chrSize, filePaths)
+  .bcf2vcf()
+  
 }
 
 
@@ -34,7 +36,7 @@ process getChromsomeInfo {
   tuple val(id), path(vcf)
 
   output:
-  path('chrInfo.txt')
+  path('chrInfo.txt'), emit: chrInfo
 
   script:
   """
@@ -60,7 +62,7 @@ process glnexus {
   path(vcfs)
 
   output:
-  path('*.bcf')
+  path('*.bcf'), emit: bcf
 
   script:
   """
@@ -68,6 +70,34 @@ process glnexus {
   glnexus_cli -t ${task.cpus} --config DeepVariant \\
   --bed <(echo -e '${chr}\t1\t${size}')  \\
   ${vcfs} > ${params.study_name}-${chr}.bcf
+  """
+
+  stub:
+  """
+  touch ${params.study_name}-${chr}.bcf
+  """
+}
+
+
+process bcf2vcf {
+  cpus 4
+  memory "8G"
+  container 'community.wave.seqera.io/library/bcftools:1.21--374767bf77752fc2'
+
+  input:
+  path(bcf)
+
+  output:
+  path('*.vcf')
+
+  script:
+  """
+  bcftools view -@ ${task.cpus} ${bcf} | bgzip -@ ${task.cpus} -c > ${bcf.baseName}.vcf.gz
+  """
+
+  stub:
+  """
+  touch ${params.study_name}-${chr}.vcf
   """
 }
 
