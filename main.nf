@@ -15,10 +15,37 @@ workflow  {
 
   getChromsomeInfo(gVCFs.take(1))
     .splitCsv()
+    .map{chr, size ->
+      bins = []
+      if (chr == 'chr22'){
+        bin = 3000000
+        i = 0
+        start = 1
+
+        while (true) {
+          binStart = bin * i + 1
+          binEnd = bin * (i + 1)
+
+          if (binEnd > size.toInteger()){
+            bins.push([chr,binStart, size.toInteger()])
+            break
+          }
+          bins.push([chr,binStart,binEnd])
+          i++
+        }
+      }
+      return bins
+    }
+    .flatten()
+    .collate(3)
+    .take(1)
     .set { chrSize }
     
-  glnexus(chrSize, filePaths)
-  bcf2vcf(glnexus.out)
+  glnexusRes = glnexus(chrSize, filePaths).groupTuple()
+  
+  glnexusRes.view()
+
+  //bcf2vcf(glnexus.out)
   
 }
 
@@ -46,22 +73,22 @@ process getChromsomeInfo {
 }
 
 process glnexus {
-  cpus 16
-  memory "64 GB" //fdasfas
+  cpus 4
+  memory "16 GB"
   container 'community.wave.seqera.io/library/glnexus_jemalloc:f7d379f09441d9b8'
 
   input:
-  tuple val(chr), val(size)
+  tuple val(chr), val(start), val(end)
   path(vcfs)
 
   output:
-  path('*.bcf'), emit: bcf
+  tuple val(chr), path('*.bcf'), emit: bcf
 
   script:
   """
   LD_PRELOAD=\$MAMBA_ROOT_PREFIX/lib/x86_64-linux-gnu/libjemalloc.so \\
   glnexus_cli -t ${task.cpus} --config DeepVariant \\
-  --bed <(echo -e '${chr}\t1\t${size}')  \\
+  --bed <(echo -e '${chr}\t${start}\t${end}')  \\
   ${vcfs} > ${params.study_name}-${chr}.bcf
   """
 
@@ -72,8 +99,8 @@ process glnexus {
 }
 
 process bcf2vcf {
-  cpus 4
-  memory "16 GB"
+  cpus 2
+  memory "4 GB"
   container 'community.wave.seqera.io/library/bcftools:1.21--374767bf77752fc2'
 
   publishDir "${params.outDir}/joint-genotyping"
