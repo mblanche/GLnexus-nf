@@ -47,7 +47,7 @@ process getChromsomeInfo {
 
 process glnexus {
   cpus 16
-  memory "64GB"
+  memory "64GB" //fdasfas
   container 'community.wave.seqera.io/library/glnexus_jemalloc:f7d379f09441d9b8'
 
   input:
@@ -73,7 +73,7 @@ process glnexus {
 
 process bcf2vcf {
   cpus 4
-  memory "8G"
+  memory "16GB"
   container 'community.wave.seqera.io/library/bcftools:1.21--374767bf77752fc2'
 
   publishDir "${params.outDir}/joint-genotyping"
