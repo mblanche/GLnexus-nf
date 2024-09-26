@@ -23,6 +23,9 @@
           "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. \nHeader:\nsample,gVCF",
           "fa_icon": "fas fa-file-csv"
         },
+        "outDir": {
+          "type": "string"
+        },
         "study_name": {
           "type": "string",
           "description": "Study"
