@@ -21,10 +21,12 @@ workflow  {
       tuple(chr,size)
       }
     }
+    .view()
     .set { chrSize }
     
   glnexus(chrSize, filePaths)
-  .bcf2vcf()
+  
+  bcf2vcf(glnexus.out)
   
 }
 
@@ -84,15 +86,18 @@ process bcf2vcf {
   memory "8G"
   container 'community.wave.seqera.io/library/bcftools:1.21--374767bf77752fc2'
 
+  publishDir "${params.outDir}/joint-genotyping"
+
   input:
   path(bcf)
 
   output:
-  path('*.vcf')
+  path('*.vcf.gz')
 
   script:
   """
-  bcftools view -@ ${task.cpus} ${bcf} | bgzip -@ ${task.cpus} -c > ${bcf.baseName}.vcf.gz
+  bcftools view --threads ${task.cpus} ${bcf} \\
+  | bgzip -@ ${task.cpus} -c > ${bcf.baseName}.vcf.gz
   """
 
   stub:
