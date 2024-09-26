@@ -5,7 +5,6 @@ params.study_name = 'study'
 workflow  {
   Channel.fromPath(params.input)
     .splitCsv(header:true)
-    .take(4)
     .map { row-> 
             tuple(row.sample, file(row.gVCF))
         }
@@ -16,11 +15,6 @@ workflow  {
 
   getChromsomeInfo(gVCFs.take(1))
     .splitCsv()
-    .map{ chr, size ->   //TODO remove after testing
-    if (chr == 'chr1') {
-      tuple(chr,size)
-      }
-    }
     .set { chrSize }
 
   indexVCF = indexVCF(gVCFs)
