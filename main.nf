@@ -10,18 +10,11 @@ workflow  {
         }
     .tap { gVCFs }
     .map { sample, gvcf -> gvcf}
-    .take(2) //TODO remove after testing
     .collect()
     .set{ filePaths }
 
   getChromsomeInfo(gVCFs.take(1))
     .splitCsv()
-    .map{ chr, size ->   //TODO remove after testing
-    if (chr == 'chr22') {
-      tuple(chr,size)
-      }
-    }
-    .view()
     .set { chrSize }
     
   glnexus(chrSize, filePaths)
