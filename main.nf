@@ -1,5 +1,5 @@
 params.input = null
-params.outDir = null
+params.outdir = null
 params.study_name = 'study'
 
 workflow  {
@@ -8,10 +8,10 @@ workflow  {
     .map { row-> 
             tuple(row.sample, file(row.gVCF))
         }
-    .tap { gVCFs }
-    .map { sample, gvcf -> gvcf}
-    .collect()
-    .set{ filePaths }
+    .set { gVCFs }
+    // .map { _sample, gvcf -> gvcf}
+    // .collect()
+    // .set{ filePaths }
 
   getChromsomeInfo(gVCFs.take(1))
     .splitCsv()
@@ -20,47 +20,13 @@ workflow  {
   indexVCF = indexVCF(gVCFs)
 
   splitVCF = splitVCF(chrSize
-    .map{ chr, size -> chr}
-    .combine(indexVCF.map{id, vcf, csi -> [vcf,csi]}))
+    .map{ chr, _size -> chr}
+    .combine(indexVCF.map{_id, vcf, csi -> [vcf,csi]}))
     .groupTuple()
 
   glnexus = glnexus(chrSize.join(splitVCF))
 
   bcf2vcf(glnexus.bcf)
-
-
-
-
-  // getChromsomeInfo(gVCFs.take(1))
-  //   .splitCsv()
-  //   .map{chr, size ->
-  //     bins = []
-  //     if (chr == 'chr22'){
-  //       bin = 3000000
-  //       i = 0
-  //       start = 1
-
-  //       while (true) {
-  //         binStart = bin * i + 1
-  //         binEnd = bin * (i + 1)
-
-  //         if (binEnd > size.toInteger()){
-  //           bins.push([chr,binStart, size.toInteger()])
-  //           break
-  //         }
-  //         bins.push([chr,binStart,binEnd])
-  //         i++
-  //       }
-  //     }
-  //     return bins
-  //   }
-  //   .flatten()
-  //   .collate(3)
-  //   .take(1)
-  //   .set { chrSize }
-    
-  // glnexusRes = glnexus(chrSize, filePaths)
-
 
   /**/
 }
@@ -152,7 +118,7 @@ process bcf2vcf {
   memory "2 GB"
   container 'community.wave.seqera.io/library/bcftools:1.21--374767bf77752fc2'
 
-  publishDir "${params.outDir}/joint-genotyping"
+  publishDir "${params.outdir}/joint-genotyping"
 
   input:
   path(bcf)
@@ -166,9 +132,5 @@ process bcf2vcf {
   | bgzip -@ ${task.cpus} -c > ${bcf.baseName}.vcf.gz
   """
 
-  stub:
-  """
-  touch ${params.study_name}-${chr}.vcf
-  """
 }
 
