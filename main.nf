@@ -12,6 +12,7 @@ workflow  {
     // .map { _sample, gvcf -> gvcf}
     // .collect()
     // .set{ filePaths }
+    //
 
   getChromsomeInfo(gVCFs.take(1))
     .splitCsv()
