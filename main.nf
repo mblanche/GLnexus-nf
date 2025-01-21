@@ -107,7 +107,7 @@ process glnexus {
   script:
   """
   LD_PRELOAD=\$MAMBA_ROOT_PREFIX/lib/x86_64-linux-gnu/libjemalloc.so \\
-  glnexus_cli -t ${task.cpus} -m 64 --config DeepVariant \\
+  glnexus_cli -t ${task.cpus} -m 64 --config DeepVariantWES \\
   --bed <(echo -e '${chr}\t1\t${size}')  \\
   ${vcfs} > ${params.study_name}-${chr}.bcf
   """
